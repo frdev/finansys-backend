@@ -1,12 +1,9 @@
 import { injectable, inject } from "tsyringe";
-import Category from "../infra/typeorm/entities/Category";
+import Category from "@modules/categories/infra/typeorm/entities/Category";
 import ICategoriesRepository from "../repositories/ICategoriesRepository";
 import ICacheProvider from "@shared/container/providers/CacheProvider/models/ICacheProvider";
 import AppError from "@shared/errors/AppError";
-
-interface IRequest {
-  name: string;
-}
+import ICreateCategoryDTO from "../dtos/ICreateCategoryDTO";
 
 @injectable()
 class CreateCategoryService {
@@ -17,14 +14,20 @@ class CreateCategoryService {
     private cacheProvider: ICacheProvider
   ) {}
 
-  public async execute({ name }: IRequest): Promise<Category> {
-    let category = await this.categoriesRepository.findByName(name);
+  public async execute({
+    name,
+    user_id,
+  }: ICreateCategoryDTO): Promise<Category> {
+    let category = await this.categoriesRepository.findByNameAndUserId({
+      name,
+      user_id,
+    });
 
     if (category) throw new AppError("Categoria ja existente.", 400);
 
-    category = await this.categoriesRepository.create({ name });
+    category = await this.categoriesRepository.create({ name, user_id });
 
-    await this.cacheProvider.invalidatePrefix("categories-list");
+    await this.cacheProvider.invalidate(`categories-list:${user_id}`);
 
     return category;
   }

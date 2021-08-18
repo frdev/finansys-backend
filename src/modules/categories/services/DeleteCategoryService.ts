@@ -3,6 +3,11 @@ import ICategoriesRepository from "../repositories/ICategoriesRepository";
 import ICacheProvider from "@shared/container/providers/CacheProvider/models/ICacheProvider";
 import AppError from "@shared/errors/AppError";
 
+interface IRequest {
+  category_id: string;
+  user_id: string;
+}
+
 @injectable()
 class DeleteCategoryService {
   constructor(
@@ -12,16 +17,15 @@ class DeleteCategoryService {
     private cacheProvider: ICacheProvider
   ) {}
 
-  public async execute(category_id: string): Promise<void> {
+  public async execute({ user_id, category_id }: IRequest): Promise<void> {
     const category = await this.categoriesRepository.findById(category_id);
 
-    console.log(category);
-
-    if (!category) throw new AppError("Categoria inexistente.", 400);
+    if (!category || category.user_id !== user_id)
+      throw new AppError("Categoria inexistente.", 400);
 
     await this.categoriesRepository.delete(category_id);
 
-    await this.cacheProvider.invalidatePrefix("categories-list");
+    await this.cacheProvider.invalidate(`categories-list:${user_id}`);
   }
 }
 

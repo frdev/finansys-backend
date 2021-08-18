@@ -1,10 +1,11 @@
 import { injectable, inject } from "tsyringe";
-import Category from "../infra/typeorm/entities/Category";
+import Category from "@modules/categories/infra/typeorm/entities/Category";
 import ICategoriesRepository from "../repositories/ICategoriesRepository";
 import ICacheProvider from "@shared/container/providers/CacheProvider/models/ICacheProvider";
 import AppError from "@shared/errors/AppError";
 
 interface IRequest {
+  user_id: string;
   category_id: string;
   name: string;
 }
@@ -18,10 +19,13 @@ class UpdateCategoryService {
     private cacheProvider: ICacheProvider
   ) {}
 
-  public async execute({ category_id, name }: IRequest): Promise<Category> {
-    let categoryWithUpdatedName = await this.categoriesRepository.findByName(
-      name
-    );
+  public async execute({
+    user_id,
+    category_id,
+    name,
+  }: IRequest): Promise<Category> {
+    let categoryWithUpdatedName =
+      await this.categoriesRepository.findByNameAndUserId({ name, user_id });
 
     if (categoryWithUpdatedName && categoryWithUpdatedName.id !== category_id)
       throw new AppError("Nome de categoria já existente.", 400);
@@ -34,7 +38,7 @@ class UpdateCategoryService {
 
     await this.categoriesRepository.save(category);
 
-    await this.cacheProvider.invalidatePrefix("categories-list");
+    await this.cacheProvider.invalidate(`categories-list:${user_id}`);
 
     return category;
   }
