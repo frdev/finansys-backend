@@ -6,5 +6,6 @@ export default interface IEntriesRepository {
   findById(entry_id: string): Promise<Entry | undefined>;
   findByBetweenDates(data: IFindEntriesByBeteweenDatesDTO): Promise<Entry[]>;
   create(date: ICreateEntryDTO): Promise<Entry>;
+  delete(entry_id: string): Promise<void>;
   save(entry: Entry): Promise<Entry>;
 }

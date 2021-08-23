@@ -3,12 +3,7 @@ import IEntriesRepository from "../repositories/IEntriesRepository";
 import ICacheProvider from "@shared/container/providers/CacheProvider/models/ICacheProvider";
 import Entry from "../infra/typeorm/entities/Entry";
 import ICreateEntryDTO from "../dtos/ICreateEntryDTO";
-
-interface IRequest {
-  user_id: string;
-  month: number;
-  year: number;
-}
+import { addHours } from "date-fns";
 
 @injectable()
 class CreateEntryService {
@@ -33,7 +28,7 @@ class CreateEntryService {
       description,
       amount,
       property,
-      date,
+      date: addHours(date, 12),
     });
 
     const year = new Date(date).getFullYear();

@@ -19,6 +19,16 @@ entriesRouter.get(
   entriesController.index
 );
 
+entriesRouter.get(
+  "/:entry_id",
+  celebrate({
+    [Segments.PARAMS]: {
+      entry_id: Joi.string().required(),
+    },
+  }),
+  entriesController.show
+);
+
 entriesRouter.post(
   "/",
   celebrate({
@@ -32,5 +42,24 @@ entriesRouter.post(
   }),
   entriesController.insert
 );
+
+entriesRouter.put(
+  "/:entry_id",
+  celebrate({
+    [Segments.PARAMS]: {
+      entry_id: Joi.string().required(),
+    },
+    [Segments.BODY]: {
+      category_id: Joi.string().required(),
+      description: Joi.string().required(),
+      amount: Joi.number().required(),
+      property: Joi.string().required(),
+      date: Joi.date().required(),
+    },
+  }),
+  entriesController.update
+);
+
+entriesRouter.delete("/:entry_id", entriesController.delete);
 
 export default entriesRouter;

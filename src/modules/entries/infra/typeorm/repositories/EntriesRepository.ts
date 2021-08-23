@@ -34,7 +34,9 @@ class EntriesRepository implements IEntriesRepository {
   }
 
   public async findById(entry_id: string): Promise<Entry | undefined> {
-    const entry = await this.ormRepository.findOne(entry_id);
+    const entry = await this.ormRepository.findOne(entry_id, {
+      relations: ["category"],
+    });
 
     return entry;
   }
@@ -44,17 +46,22 @@ class EntriesRepository implements IEntriesRepository {
     initial,
     final,
   }: IFindEntriesByBeteweenDatesDTO): Promise<Entry[]> {
-    console.log(initial, final);
-
     const entries = await this.ormRepository.find({
       where: {
         user_id,
         date: Between(initial, final),
       },
+      order: {
+        date: "DESC",
+      },
       relations: ["category"],
     });
 
     return entries;
+  }
+
+  public async delete(entry_id: string): Promise<void> {
+    await this.ormRepository.delete(entry_id);
   }
 
   public async save(entry: Entry): Promise<Entry> {
