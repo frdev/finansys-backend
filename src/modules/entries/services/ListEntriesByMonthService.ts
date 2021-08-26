@@ -23,7 +23,8 @@ class ListEntriesByMonthService {
   public async execute({ user_id, month, year }: IRequest): Promise<Entry[]> {
     const keyCache = `list-entries:${user_id}:${year}-${month}`;
 
-    let entries = await this.cacheProvider.recover<Entry[]>(keyCache);
+    // let entries = await this.cacheProvider.recover<Entry[]>(keyCache);
+    let entries = null;
 
     if (!entries) {
       const initial = new Date(year, month, 1, 0, 0, 0);

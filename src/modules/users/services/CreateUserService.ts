@@ -1,4 +1,5 @@
 import { inject, injectable } from "tsyringe";
+import { classToClass } from "class-transformer";
 import IUsersRepository from "../repositories/IUsersRepository";
 import IHashProvider from "@shared/container/providers/HashProvider/models/IHashProvider";
 import ICreateUserDTO from "../dtos/ICreateUserDTO";
@@ -31,7 +32,7 @@ class CreateUserService {
       password: hashedPassword,
     });
 
-    return user;
+    return classToClass(user);
   }
 }
 

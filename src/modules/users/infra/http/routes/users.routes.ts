@@ -25,6 +25,19 @@ usersRouter.post(
 
 usersRouter.use(ensureAuthenticated);
 
+usersRouter.put(
+  "/",
+  celebrate({
+    [Segments.BODY]: {
+      name: Joi.string().required(),
+      email: Joi.string().email().required(),
+      old_password: Joi.string(),
+      password: Joi.string(),
+    },
+  }),
+  usersController.update
+);
+
 usersRouter.patch(
   "/avatar",
   upload.single("avatar"),

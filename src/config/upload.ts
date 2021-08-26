@@ -1,17 +1,20 @@
 import multer, { StorageEngine } from "multer";
 import crypto from "crypto";
 import path from "path";
+import AppError from "@shared/errors/AppError";
 
 const tmpFolder = path.resolve(__dirname, "..", "..", "tmp");
 
 interface IUploadConfig {
-  driver: "disk";
+  driver: "disk" | "s3";
   tmpFolder: string;
   uploadFolder: string;
   multer: {
     storage: StorageEngine;
   };
-  config: {};
+  config: {
+    [key: string]: { bucket: string; region: string };
+  };
 }
 
 export default {
@@ -28,6 +31,24 @@ export default {
         return callback(null, fileName);
       },
     }),
+    fileFilter: (_: any, file: any, callback: any) => {
+      if (["image/png", "image/jpg", "image/jpeg"].includes(file.mimetype)) {
+        callback(null, true);
+      } else {
+        callback(null, false);
+        return callback(
+          new AppError(
+            "Somente arquivos .png, .jpg e .jpeg são permitidos!",
+            400
+          )
+        );
+      }
+    },
   },
-  config: {},
+  config: {
+    aws: {
+      bucket: "app-finansys",
+      region: "us-east-2",
+    },
+  },
 } as IUploadConfig;
