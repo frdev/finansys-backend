@@ -32,7 +32,11 @@ export default {
       },
     }),
     fileFilter: (_: any, file: any, callback: any) => {
-      if (["image/png", "image/jpg", "image/jpeg"].includes(file.mimetype)) {
+      if (
+        "image/png" === file.mimetype ||
+        "image/jpg" === file.mimetype ||
+        "image/jpeg" === file.mimetype
+      ) {
         callback(null, true);
       } else {
         callback(null, false);
